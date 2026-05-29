@@ -1,0 +1,77 @@
+name: Semgrep
+ 
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+    branches: ["main", "develop"]
+  schedule:
+    - cron: '0 8 * * 1'  # weekly full scan every Monday 8am
+ 
+jobs:
+  semgrep:
+    name: Semgrep Scan
+    runs-on: ubuntu-latest
+    container:
+      image: semgrep/semgrep
+ 
+    permissions:
+      contents: read
+      security-events: write  # required for SARIF upload to GitHub Security tab
+ 
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # full history needed for accurate diff on PRs
+ 
+      - name: Run SAST (Code)
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+        run: |
+          semgrep ci \
+            --config=auto \
+            --sarif \
+            --output=semgrep-sast.sarif
+        continue-on-error: true  # remove this if you want SAST to block the pipeline
+ 
+      - name: Run SCA (Supply Chain)
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+        run: |
+          semgrep ci \
+            --supply-chain \
+            --sarif \
+            --output=semgrep-sca.sarif
+        continue-on-error: true
+ 
+      - name: Run Secrets Detection
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+        run: |
+          semgrep ci \
+            --secrets \
+            --sarif \
+            --output=semgrep-secrets.sarif
+        continue-on-error: true
+ 
+      - name: Upload SAST results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep-sast.sarif
+          category: semgrep-sast
+        if: always()
+ 
+      - name: Upload SCA results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep-sca.sarif
+          category: semgrep-sca
+        if: always()
+ 
+      - name: Upload Secrets results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep-secrets.sarif
+          category: semgrep-secrets
+        if: always()
