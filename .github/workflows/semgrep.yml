@@ -8,7 +8,7 @@ on:
     - .github/workflows/semgrep.yml
   schedule:
   # 04:47 every Monday
-  - cron: 04 57 * * 1
+  - cron: 57 04 * * *
 name: Semgrep
 jobs:
   semgrep:
