@@ -2,10 +2,11 @@
 
 ### Requisites
 
-* ImageMagick: https://imagemagick.org/index.php
-* Python 3.7+
-* Docker (if want to run in a container)
+- Just a random update
 
+- ImageMagick: https://imagemagick.org/index.php
+- Python 3.7+
+- Docker (if want to run in a container)
 
 ### Running
 
@@ -19,7 +20,6 @@ docker build -t vuln-flask-web-app .
 docker run -it -p 5000:5000 --rm --name vuln-flask-web-app vuln-flask-web-app
 ```
 
-
 #### Run Local
 
 ```
@@ -29,8 +29,8 @@ sh setup.sh
 sh run.sh
 ```
 
-
 ### Options
+
 #### Restricting Access (optional)
 
 By default, the api key is set to `None` and any request will be allowed.
@@ -52,3 +52,4 @@ Host: localhost:5000
 Cookie: api_key=myapisecret
 
 ...
+```
