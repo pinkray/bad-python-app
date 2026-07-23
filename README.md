@@ -1,5 +1,6 @@
 ## Setup
-
+## Semgrep Technical Assessment Demo
+This repository is configured for automated security scanning.
 ### Requisites
 
 * ImageMagick: https://imagemagick.org/index.php
