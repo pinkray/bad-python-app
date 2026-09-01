@@ -1,23 +1,22 @@
-import os
-import flask
+import sh
 
-app = flask.Flask(__name__)
+long = os.environ.get("LONG", "")
+# ruleid: string-concat
+sh.ls("-a" + long)
 
+# ok: string-concat
+sh.ls("-al")
 
-@app.route("/route_param/<route_param>")
-def route_param(route_param):
+# ok: string-concat
+sh.semgrep("--config", "https://semgrep.dev/p/r2c-CI")
 
-    # ruleid:dangerous-os-exec
-    os.execl("/bin/bash", "/bin/bash", "-c", route_param)
+confurl = os.environ.get("SEMGREP_CONFIG_URL", "")
+# ruleid: string-concat
+sh.semgrep("--config {}".format(confurl))
 
-    return "oops!"
+# ruleid: string-concat
+sh.semgrep(f"--config {confurl}")
 
-
-# Flask true negatives
-@app.route("/route_param/<route_param>")
-def route_param2(route_param):
-
-    # ok:dangerous-os-exec
-    os.execl("static")
-
-    return "Ok!"
+# ok: string-concat
+args = ["--config", confurl]
+sh.semgrep(*args)
